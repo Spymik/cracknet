@@ -92,6 +92,8 @@ test_data = train_gen.flow_from_dataframe(
 inputs = Input(shape=(120, 120, 3))
 x = layers.Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(inputs)
 x = layers.MaxPool2D(pool_size=(2, 2))(x)
+x = layers.Conv2D(filters=128, kernel_size=(3, 3), activation='relu')(x)
+x = layers.MaxPool2D(pool_size=(2, 2))(x)
 x = layers.Conv2D(filters=64, kernel_size=(3, 3), activation='relu')(x)
 x = layers.MaxPool2D(pool_size=(2, 2))(x)
 x = layers.GlobalAveragePooling2D()(x)
