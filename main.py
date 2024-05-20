@@ -130,6 +130,7 @@ fig = px.line(
 )
 
 fig.show()
+model.save('cracknet_model.h5')
 
 
 def evaluate_model(model, test_data):
