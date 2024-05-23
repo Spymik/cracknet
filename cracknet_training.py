@@ -17,9 +17,11 @@ from sklearn.metrics import confusion_matrix, classification_report
 import warnings
 warnings.filterwarnings('ignore')
 
+
 positive_dir = Path('./dataset/Positive')
 negative_dir = Path('./dataset/Negative')
 BATCH = 64
+IMSIZE = 120
 
 
 def generate_df(image_dir, label):
@@ -55,7 +57,7 @@ train_data = train_gen.flow_from_dataframe(
     train_df,
     x_col='Filepath',
     y_col='Label',
-    target_size=(120, 120),
+    target_size=(IMSIZE, IMSIZE),
     color_mode='rgb',
     class_mode='binary',
     batch_size=BATCH,
@@ -68,7 +70,7 @@ val_data = train_gen.flow_from_dataframe(
     train_df,
     x_col='Filepath',
     y_col='Label',
-    target_size=(120, 120),
+    target_size=(IMSIZE, IMSIZE),
     color_mode='rgb',
     class_mode='binary',
     batch_size=BATCH,
@@ -81,7 +83,7 @@ test_data = train_gen.flow_from_dataframe(
     test_df,
     x_col='Filepath',
     y_col='Label',
-    target_size=(120, 120),
+    target_size=(IMSIZE, IMSIZE),
     color_mode='rgb',
     class_mode='binary',
     batch_size=BATCH,
@@ -89,14 +91,31 @@ test_data = train_gen.flow_from_dataframe(
     seed=42
 )
 
-inputs = Input(shape=(120, 120, 3))
-x = layers.Conv2D(filters=32, kernel_size=(3, 3), activation='relu')(inputs)
+inputs = Input(shape=(IMSIZE, IMSIZE, 3))
+
+x = layers.Dense(units=64, activation='relu')(inputs)
+x = layers.Dropout(rate=0.2)(x)
 x = layers.MaxPool2D(pool_size=(2, 2))(x)
-x = layers.Conv2D(filters=128, kernel_size=(3, 3), activation='relu')(x)
-x = layers.MaxPool2D(pool_size=(2, 2))(x)
+
 x = layers.Conv2D(filters=64, kernel_size=(3, 3), activation='relu')(x)
 x = layers.MaxPool2D(pool_size=(2, 2))(x)
+
+x = layers.Dense(units=128, activation='relu')(x)
+x = layers.Dropout(rate=0.2)(x)
+x = layers.MaxPool2D(pool_size=(2, 2))(x)
+
+x = layers.Conv2D(filters=128, kernel_size=(3, 3), activation='relu')(x)
+x = layers.MaxPool2D(pool_size=(2, 2))(x)
+
+x = layers.Dense(units=64, activation='relu')(x)
+x = layers.Dropout(rate=0.2)(x)
+# x = layers.MaxPool2D(pool_size=(2, 2))(x)
+
+x = layers.Conv2D(filters=64, kernel_size=(3, 3), activation='relu')(x)
+# x = layers.MaxPool2D(pool_size=(2, 2))(x)
+
 x = layers.GlobalAveragePooling2D()(x)
+
 outputs = layers.Dense(1, activation='sigmoid')(x)
 
 model = Model(inputs=inputs, outputs=outputs)
@@ -116,7 +135,7 @@ history = model.fit(
     callbacks=[
         tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
-            patience=3,
+            patience=10,
             restore_best_weights=True
         )
     ]
