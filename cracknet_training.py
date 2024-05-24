@@ -109,14 +109,12 @@ x = layers.MaxPool2D(pool_size=(2, 2))(x)
 
 x = layers.Dense(units=64, activation='relu')(x)
 x = layers.Dropout(rate=0.2)(x)
-# x = layers.MaxPool2D(pool_size=(2, 2))(x)
 
 x = layers.Conv2D(filters=64, kernel_size=(3, 3), activation='relu')(x)
-# x = layers.MaxPool2D(pool_size=(2, 2))(x)
 
 x = layers.GlobalAveragePooling2D()(x)
 
-outputs = layers.Dense(1, activation='sigmoid')(x)
+outputs = layers.Dense(units=1, activation='sigmoid')(x)
 
 model = Model(inputs=inputs, outputs=outputs)
 
